@@ -1,0 +1,38 @@
+/**
+ * Standalone data collection script
+ * Can be run manually or via cron job
+ */
+
+const mongoose = require('mongoose');
+require('dotenv').config();
+
+const connectDB = require('../config/database');
+const dataCollectorService = require('../services/dataCollectorService');
+
+async function main() {
+    console.log('🔄 Starting MGNREGA data collection process...');
+    console.log(`📅 ${new Date().toISOString()}`);
+    
+    try {
+        // Connect to database
+        await connectDB();
+        console.log('✅ Connected to database');
+
+        // Collect data for all districts
+        await dataCollectorService.collectAllData();
+
+        console.log('✅ Data collection completed successfully');
+        process.exit(0);
+    } catch (error) {
+        console.error('❌ Data collection failed:', error.message);
+        process.exit(1);
+    }
+}
+
+// Run if executed directly
+if (require.main === module) {
+    main();
+}
+
+module.exports = main;
+
