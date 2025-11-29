@@ -6,23 +6,24 @@
     <meta name="description" content="MGNREGA Made Easy - Know where your region stands with simple visualizations">
     <title>MGNREGA Made Easy | Know Where Your Region Stands</title>
     
-    <!-- Chart.js -->
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Header -->
+   
     <header class="header">
         <div class="container">
             <div class="logo">
                 <h1>🎯 MGNREGA Made Easy</h1>
+                
                 <p class="tagline">Know Where Your Region Stands</p>
             </div>
         </div>
     </header>
 
-    <!-- Loading Screen -->
+    
     <div id="loadingScreen" class="loading-screen">
         <div class="loading-content">
             <div class="spinner"></div>
@@ -31,9 +32,9 @@
         </div>
     </div>
 
-    <!-- Main Content -->
+   
     <main class="main-container" id="mainContent" style="display: none;">
-        <!-- Hero Section -->
+       
         <section class="hero">
             <div class="container">
                 <div class="location-info">
@@ -43,21 +44,21 @@
             </div>
         </section>
 
-        <!-- Language Selector -->
+        
         <section class="language-selector" id="languageSelector">
             <div class="container">
                 <label for="langSelect">🌐 Choose Language:</label>
                 <select id="langSelect" onchange="switchLanguage()">
                     <option value="English">English</option>
                 </select>
-                <!-- Regional Language Translate Button -->
+                
                 <button id="translateRegionalBtn" class="translate-btn" onclick="translateToRegional()" style="display: none;">
                     <span id="translateBtnText">Translate to Regional Language</span>
                 </button>
             </div>
         </section>
 
-        <!-- Employment Chart -->
+       
         <section class="chart-section">
             <div class="container">
                 <div class="chart-card">
@@ -65,12 +66,18 @@
                     <div class="chart-container">
                         <canvas id="employmentChart"></canvas>
                     </div>
-                    <div class="chart-explanation" id="employmentExplanation"></div>
+                   <div class="chart-explanation-container">
+                        <div class="chart-explanation" id="employmentExplanation"></div>
+                        <button class="speak-btn" onclick="speakExplanation('employment')" title="Listen to explanation">
+                            <span class="speak-icon">🔊</span>
+                            <span class="speak-text">Listen</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Expenditure Chart -->
+        
         <section class="chart-section">
             <div class="container">
                 <div class="chart-card">
@@ -78,12 +85,18 @@
                     <div class="chart-container">
                         <canvas id="expenditureChart"></canvas>
                     </div>
-                    <div class="chart-explanation" id="expenditureExplanation"></div>
+                    <div class="chart-explanation-container">
+                        <div class="chart-explanation" id="expenditureExplanation"></div>
+                        <button class="speak-btn" onclick="speakExplanation('expenditure')" title="Listen to explanation">
+                            <span class="speak-icon">🔊</span>
+                            <span class="speak-text">Listen</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Works Status Chart -->
+       
         <section class="chart-section">
             <div class="container">
                 <div class="chart-card">
@@ -91,12 +104,18 @@
                     <div class="chart-container">
                         <canvas id="worksChart"></canvas>
                     </div>
-                    <div class="chart-explanation" id="worksExplanation"></div>
+                   <div class="chart-explanation-container">
+                        <div class="chart-explanation" id="worksExplanation"></div>
+                        <button class="speak-btn" onclick="speakExplanation('works')" title="Listen to explanation">
+                            <span class="speak-icon">🔊</span>
+                            <span class="speak-text">Listen</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Historical Trend -->
+       
         <section class="chart-section">
             <div class="container">
                 <div class="chart-card">
@@ -108,18 +127,18 @@
             </div>
         </section>
 
-        <!-- Key Statistics -->
+       
         <section class="stats-section">
             <div class="container">
                 <h2>📊 Key Statistics</h2>
                 <div class="stats-grid" id="statsGrid">
-                    <!-- Stats will be populated here -->
+                    
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- Footer -->
+   
     <footer class="footer">
         <div class="container">
             <p>&copy; 2024 MGNREGA Made Easy | Empowering Rural India</p>

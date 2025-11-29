@@ -6,15 +6,12 @@ class LocationService {
     this.freegeoipUrl = 'https://ipapi.co/json/';
   }
 
-  /**
-   * Get location from coordinates (from browser geolocation)
-   * Uses reverse geocoding to get district and state
-   */
+ 
   async getLocationFromCoordinates(lat, lon) {
     try {
       console.log(`📍 Getting location from coordinates: ${lat}, ${lon}`);
 
-      // Use OpenStreetMap Nominatim API (free, no key required)
+     
       const response = await axios.get(`https://nominatim.openstreetmap.org/reverse`, {
         params: {
           lat: lat,

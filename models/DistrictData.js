@@ -31,7 +31,7 @@ const DistrictDataSchema = new mongoose.Schema({
   dataPoints: [{
     month: {
       type: String,
-      required: true // Format: YYYY-MM
+      required: true 
     },
     year: {
       type: Number,

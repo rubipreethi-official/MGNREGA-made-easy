@@ -1,18 +1,14 @@
-// Global state
+
 let dashboardData = null;
 let currentLanguage = 'English';
 let charts = {};
-let regionalLanguage = null; // Detected regional language (e.g., 'Tamil')
+let regionalLanguage = null; 
 
-// Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 MGNREGA Made Easy - Initializing...');
     await loadDashboard();
 });
 
-/**
- * Get user's location using browser Geolocation API
- */
 function getBrowserLocation() {
     return new Promise((resolve, reject) => {
         if (!navigator.geolocation) {
@@ -36,21 +32,19 @@ function getBrowserLocation() {
             {
                 enableHighAccuracy: true,
                 timeout: 10000,
-                maximumAge: 300000 // 5 minutes cache
+                maximumAge: 300000 
             }
         );
     });
 }
 
-/**
- * Load dashboard data from API
- */
+
 async function loadDashboard() {
     try {
-        // Try to get browser location first
+       
         const browserLocation = await getBrowserLocation();
         
-        // Build API URL with coordinates if available
+        
         let apiUrl = '/api/dashboard';
         if (browserLocation) {
             apiUrl += `?lat=${browserLocation.lat}&lon=${browserLocation.lon}`;
@@ -67,24 +61,23 @@ async function loadDashboard() {
         dashboardData = result.data;
         currentLanguage = 'English';
 
-        // Debug: Log what we received
+        
         console.log('📊 Dashboard data received:', {
             detectedLocation: result.detectedLocation,
             detectedLanguages: result.data.summary?.detectedLanguages,
             allData: result.data
         });
 
-        // Update UI with data
+       
         updateDistrictInfo(result.detectedLocation);
-        
-        // Get detected languages from the correct path
+
         const detectedLanguages = result.data.summary?.detectedLanguages || 
                                   result.data.detectedLanguages || 
                                   ['English'];
         
         console.log('🌍 Detected languages:', detectedLanguages);
         
-        // Make sure detectedLanguages is in the data object for populateLanguageSelector
+        
         if (!result.data.detectedLanguages) {
             result.data.detectedLanguages = detectedLanguages;
         }
@@ -113,25 +106,20 @@ async function loadDashboard() {
     }
 }
 
-/**
- * Update district information display
- */
+
 function updateDistrictInfo(location) {
     const districtInfo = document.getElementById('districtInfo');
     districtInfo.textContent = `📍 ${location.district}, ${location.state}, ${location.country}`;
 }
 
-/**
- * Populate language selector dropdown and show regional translate button
- */
+
 function populateLanguageSelector(data) {
     const langSelect = document.getElementById('langSelect');
     const languages = data.detectedLanguages || ['English'];
 
-    // Clear existing options
+    
     langSelect.innerHTML = '';
 
-    // Add all languages
     languages.forEach(lang => {
         const option = document.createElement('option');
         option.value = lang;
@@ -141,11 +129,10 @@ function populateLanguageSelector(data) {
 
     currentLanguage = langSelect.value;
     
-    // Show regional language translate button if regional language detected
+   
     const translateBtn = document.getElementById('translateRegionalBtn');
     const translateBtnText = document.getElementById('translateBtnText');
     
-    // Find the first non-English language (regional language)
     const regionalLang = languages.find(lang => lang !== 'English');
     
     if (regionalLang) {
@@ -164,12 +151,9 @@ function populateLanguageSelector(data) {
     }
 }
 
-/**
- * Translate page content on-demand when user selects language
- */
+
 async function translatePageContent(language) {
     if (language === 'English') {
-        // Reset to English
         const pageContent = dashboardData.pageContent?.English || {};
         if (pageContent.title) document.querySelector('.logo h1').textContent = `🎯 ${pageContent.title}`;
         if (pageContent.tagline) document.querySelector('.tagline').textContent = pageContent.tagline;
@@ -177,12 +161,12 @@ async function translatePageContent(language) {
         if (pageContent.statsTitle) document.querySelector('.stats-section h2').textContent = `📊 ${pageContent.statsTitle}`;
         if (pageContent.chooseLanguage) document.querySelector('.language-selector label').textContent = `🌐 ${pageContent.chooseLanguage}`;
         
-        // Re-render stats
+       
         if (dashboardData) renderStats(dashboardData);
         return;
     }
 
-    // Show loading indicator
+    
     const langSelect = document.getElementById('langSelect');
     const originalDisabled = langSelect.disabled;
     langSelect.disabled = true;
@@ -213,7 +197,7 @@ async function translatePageContent(language) {
             pageContentEn.perDayLabel || 'Per Day'
         ];
 
-        // Translate all texts
+        
         const response = await fetch('/api/translate-batch', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -224,7 +208,7 @@ async function translatePageContent(language) {
         if (result.success && result.translated && result.translated.length === textsToTranslate.length) {
             const translations = result.translated;
             
-            // Update page elements
+            
             const logoH1 = document.querySelector('.logo h1');
             const tagline = document.querySelector('.tagline');
             const welcomeH2 = document.querySelector('.location-info h2');
@@ -242,7 +226,7 @@ async function translatePageContent(language) {
             if (statsH2) statsH2.textContent = `📊 ${translations[7]}`;
             if (langLabel) langLabel.textContent = `🌐 ${translations[8]}`;
             
-            // Store translated content for stats
+
             if (!dashboardData.pageContent) dashboardData.pageContent = {};
             dashboardData.pageContent[language] = {
                 title: translations[0],
@@ -267,7 +251,6 @@ async function translatePageContent(language) {
                 perDayLabel: translations[19]
             };
             
-            // Re-render stats with translated labels
             renderStats(dashboardData);
             
             console.log(`✅ Page translated to ${language}`);
@@ -282,14 +265,12 @@ async function translatePageContent(language) {
     }
 }
 
-/**
- * Switch language
- */
+
 async function switchLanguage() {
     const langSelect = document.getElementById('langSelect');
     currentLanguage = langSelect.value;
     
-    // Translate page content (async, on-demand)
+    
     await translatePageContent(currentLanguage);
     
     // Translate explanations
@@ -298,23 +279,19 @@ async function switchLanguage() {
     }
 }
 
-/**
- * Translate explanations when language is selected
- */
 async function translateExplanations(language) {
     if (!dashboardData || !dashboardData.explanations) {
         console.error('❌ No dashboard data or explanations available');
         return;
     }
     
-    // If already translated, use it
+    
     if (dashboardData.explanations[language]) {
         console.log(`✅ Using cached translation for ${language}`);
         updateExplanations(dashboardData);
         return;
     }
     
-    // Translate explanations on-demand
     try {
         const explanationsEn = dashboardData.explanations.English || {};
         
@@ -345,7 +322,7 @@ async function translateExplanations(language) {
         console.log('📥 Translation response:', result);
         
         if (result.success && result.translated && result.translated.length === 3) {
-            // Store translated explanations
+            
             if (!dashboardData.explanations[language]) {
                 dashboardData.explanations[language] = {};
             }
@@ -363,17 +340,15 @@ async function translateExplanations(language) {
         }
     } catch (error) {
         console.error('❌ Error translating explanations:', error);
-        // Fallback to English
+        
         if (dashboardData.explanations.English) {
             updateExplanations(dashboardData);
         }
-        throw error; // Re-throw to let caller handle it
+        throw error; 
     }
 }
 
-/**
- * Translate descriptions to regional language (called by button click)
- */
+
 async function translateToRegional() {
     console.log('🔄 Translate to regional button clicked');
     
@@ -391,7 +366,7 @@ async function translateToRegional() {
         return;
     }
     
-    // Disable button and show loading
+    
     const originalText = translateBtnText.textContent;
     translateBtn.disabled = true;
     translateBtnText.textContent = 'Translating...';
@@ -400,10 +375,10 @@ async function translateToRegional() {
     try {
         console.log(`🌍 Translating descriptions to ${regionalLanguage}...`);
         
-        // Translate explanations/descriptions only
+        
         await translateExplanations(regionalLanguage);
         
-        // Update button text to show it's translated
+       
         translateBtnText.textContent = `✓ Translated to ${regionalLanguage}`;
         translateBtn.style.background = '#27ae60';
         translateBtn.disabled = false;
@@ -411,7 +386,7 @@ async function translateToRegional() {
         
         console.log(`✅ Descriptions translated to ${regionalLanguage}`);
         
-        // Keep the success message for 3 seconds, then reset
+        
         setTimeout(() => {
             translateBtnText.textContent = originalText;
             translateBtn.style.background = '';
@@ -427,9 +402,7 @@ async function translateToRegional() {
     }
 }
 
-/**
- * Render all charts
- */
+
 function renderCharts(data) {
     renderEmploymentChart(data.summary);
     renderExpenditureChart(data.summary);
@@ -437,9 +410,7 @@ function renderCharts(data) {
     renderTrendChart(data.historical);
 }
 
-/**
- * Employment Pie Chart
- */
+
 function renderEmploymentChart(summary) {
     const ctx = document.getElementById('employmentChart').getContext('2d');
 
@@ -492,9 +463,7 @@ function renderEmploymentChart(summary) {
     });
 }
 
-/**
- * Expenditure Pie Chart
- */
+
 function renderExpenditureChart(summary) {
     const ctx = document.getElementById('expenditureChart').getContext('2d');
 
@@ -611,9 +580,7 @@ function renderWorksChart(summary) {
     });
 }
 
-/**
- * Employment Trend Line Chart
- */
+
 function renderTrendChart(historical) {
     const ctx = document.getElementById('trendChart').getContext('2d');
 
@@ -681,14 +648,12 @@ function renderTrendChart(historical) {
     });
 }
 
-/**
- * Render statistics cards
- */
+
 function renderStats(data) {
     const statsGrid = document.getElementById('statsGrid');
     const summary = data.summary;
     
-    // Get labels in current language
+    
     const pageContent = (data.pageContent && data.pageContent[currentLanguage]) || 
                         (data.pageContent && data.pageContent['English']) || {};
     
@@ -751,10 +716,286 @@ function updateExplanations(data) {
     document.getElementById('worksExplanation').textContent = explanations.works;
 }
 
-// Export for debugging
+
 window.dashboardDebug = {
     data: () => dashboardData,
     language: () => currentLanguage,
     charts: () => charts
 };
+// ==================== TEXT-TO-SPEECH FUNCTIONALITY ====================
 
+/**
+ * Speech synthesis state
+ */
+const SpeechState = {
+  speaking: false,
+  currentUtterance: null
+};
+
+/**
+ * Get voice for language using Web Speech API
+ */
+function getVoiceForLanguage(language) {
+  const voices = window.speechSynthesis.getVoices();
+  
+  // Language code mapping
+  const languageCodeMap = {
+    'Tamil': 'ta-IN',
+    'Hindi': 'hi-IN',
+    'Telugu': 'te-IN',
+    'Marathi': 'mr-IN',
+    'Bengali': 'bn-IN',
+    'Gujarati': 'gu-IN',
+    'Kannada': 'kn-IN',
+    'Malayalam': 'ml-IN',
+    'Punjabi': 'pa-IN',
+    'Odia': 'or-IN',
+    'Assamese': 'as-IN',
+    'Urdu': 'ur-IN',
+    'English': 'en-IN'
+  };
+
+  const langCode = languageCodeMap[language] || 'en-IN';
+  
+  // Try to find a voice that matches the language
+  let voice = voices.find(v => v.lang === langCode);
+  
+  // Fallback to English if specific language not found
+  if (!voice) {
+    voice = voices.find(v => v.lang.startsWith('en'));
+  }
+  
+  return voice;
+}
+
+/**
+ * Speak text using Web Speech API
+ */
+function speakText(text, language = 'English') {
+  // Stop any ongoing speech
+  if (SpeechState.speaking) {
+    window.speechSynthesis.cancel();
+    SpeechState.speaking = false;
+    return;
+  }
+
+  // Check if browser supports speech synthesis
+  if (!('speechSynthesis' in window)) {
+    alert('Sorry, your browser does not support text-to-speech. Please try Chrome or Edge.');
+    return;
+  }
+
+  // Create utterance
+  const utterance = new SpeechSynthesisUtterance(text);
+  
+  // Set voice based on language
+  const voice = getVoiceForLanguage(language);
+  if (voice) {
+    utterance.voice = voice;
+  }
+  
+  // Set language code
+  const languageCodeMap = {
+    'Tamil': 'ta-IN',
+    'Hindi': 'hi-IN',
+    'Telugu': 'te-IN',
+    'Marathi': 'mr-IN',
+    'Bengali': 'bn-IN',
+    'Gujarati': 'gu-IN',
+    'Kannada': 'kn-IN',
+    'Malayalam': 'ml-IN',
+    'Punjabi': 'pa-IN',
+    'Odia': 'or-IN',
+    'Assamese': 'as-IN',
+    'Urdu': 'ur-IN',
+    'English': 'en-IN'
+  };
+  utterance.lang = languageCodeMap[language] || 'en-IN';
+  
+  // Speech properties
+  utterance.rate = 0.9; // Slightly slower for clarity
+  utterance.pitch = 1.0;
+  utterance.volume = 1.0;
+
+  // Event listeners
+  utterance.onstart = () => {
+    SpeechState.speaking = true;
+    SpeechState.currentUtterance = utterance;
+    console.log(`🔊 Speaking in ${language}...`);
+  };
+
+  utterance.onend = () => {
+    SpeechState.speaking = false;
+    SpeechState.currentUtterance = null;
+    console.log('✅ Speech finished');
+  };
+
+  utterance.onerror = (event) => {
+    console.error('❌ Speech error:', event.error);
+    SpeechState.speaking = false;
+    SpeechState.currentUtterance = null;
+    
+    if (event.error === 'not-allowed') {
+      alert('Please allow audio playback in your browser settings.');
+    }
+  };
+
+  // Speak
+  window.speechSynthesis.speak(utterance);
+}
+
+/**
+ * Stop speech
+ */
+function stopSpeech() {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    SpeechState.speaking = false;
+    SpeechState.currentUtterance = null;
+  }
+}
+
+/**
+ * Load voices (needed for some browsers)
+ */
+if ('speechSynthesis' in window) {
+  // Chrome loads voices asynchronously
+  window.speechSynthesis.onvoiceschanged = () => {
+    const voices = window.speechSynthesis.getVoices();
+    console.log(`🎤 Loaded ${voices.length} voices`);
+  };
+}
+
+/**
+ * Speak chart explanation
+ */
+/**
+ * Speak chart explanation with visual feedback
+ */
+function speakExplanation(chartType) {
+  if (!dashboardData || !dashboardData.explanations) {
+    alert('Please wait for data to load first.');
+    return;
+  }
+
+  // Find the button that was clicked
+  const buttons = document.querySelectorAll('.speak-btn');
+  let activeButton = null;
+  
+  buttons.forEach(btn => {
+    const container = btn.closest('.chart-explanation-container');
+    const explanationDiv = container.querySelector('.chart-explanation');
+    if (explanationDiv.id.includes(chartType)) {
+      activeButton = btn;
+    }
+  });
+
+  // If already speaking, stop
+  if (SpeechState.speaking) {
+    stopSpeech();
+    if (activeButton) {
+      activeButton.classList.remove('speaking');
+      activeButton.querySelector('.speak-icon').textContent = '🔊';
+      activeButton.querySelector('.speak-text').textContent = 'Listen';
+    }
+    return;
+  }
+
+  const explanations = dashboardData.explanations[currentLanguage] || 
+                       dashboardData.explanations['English'];
+  
+  let text = '';
+  switch(chartType) {
+    case 'employment':
+      text = explanations.employment;
+      break;
+    case 'expenditure':
+      text = explanations.expenditure;
+      break;
+    case 'works':
+      text = explanations.works;
+      break;
+    default:
+      text = 'No explanation available.';
+  }
+
+  if (text) {
+    // Update button state
+    if (activeButton) {
+      activeButton.classList.add('speaking');
+      activeButton.querySelector('.speak-icon').textContent = '⏸️';
+      activeButton.querySelector('.speak-text').textContent = 'Stop';
+    }
+
+    // Create utterance
+    const utterance = new SpeechSynthesisUtterance(text);
+    
+    // Set voice based on language
+    const voice = getVoiceForLanguage(currentLanguage);
+    if (voice) {
+      utterance.voice = voice;
+    }
+    
+    // Set language code
+    const languageCodeMap = {
+      'Tamil': 'ta-IN',
+      'Hindi': 'hi-IN',
+      'Telugu': 'te-IN',
+      'Marathi': 'mr-IN',
+      'Bengali': 'bn-IN',
+      'Gujarati': 'gu-IN',
+      'Kannada': 'kn-IN',
+      'Malayalam': 'ml-IN',
+      'Punjabi': 'pa-IN',
+      'Odia': 'or-IN',
+      'Assamese': 'as-IN',
+      'Urdu': 'ur-IN',
+      'English': 'en-IN'
+    };
+    utterance.lang = languageCodeMap[currentLanguage] || 'en-IN';
+    
+    utterance.rate = 0.9;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+
+    utterance.onstart = () => {
+      SpeechState.speaking = true;
+      SpeechState.currentUtterance = utterance;
+      console.log(`🔊 Speaking in ${currentLanguage}...`);
+    };
+
+    utterance.onend = () => {
+      SpeechState.speaking = false;
+      SpeechState.currentUtterance = null;
+      if (activeButton) {
+        activeButton.classList.remove('speaking');
+        activeButton.querySelector('.speak-icon').textContent = '🔊';
+        activeButton.querySelector('.speak-text').textContent = 'Listen';
+      }
+      console.log('✅ Speech finished');
+    };
+
+    utterance.onerror = (event) => {
+      console.error('❌ Speech error:', event.error);
+      SpeechState.speaking = false;
+      if (activeButton) {
+        activeButton.classList.remove('speaking');
+        activeButton.querySelector('.speak-icon').textContent = '🔊';
+        activeButton.querySelector('.speak-text').textContent = 'Listen';
+      }
+      
+      if (event.error === 'not-allowed') {
+        alert('Please allow audio playback in your browser settings.');
+      } else if (event.error === 'language-unavailable') {
+        alert(`Sorry, ${currentLanguage} voice is not available. Trying English...`);
+        
+        utterance.lang = 'en-IN';
+        window.speechSynthesis.speak(utterance);
+      }
+    };
+
+    window.speechSynthesis.speak(utterance);
+  } else {
+    alert('Explanation not available yet. Please select a language first.');
+  }
+}

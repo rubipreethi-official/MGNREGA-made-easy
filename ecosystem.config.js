@@ -19,7 +19,7 @@ module.exports = {
     autorestart: true,
     watch: false,
     max_memory_restart: '500M',
-    cron_restart: '0 0 * * *' // Restart daily at midnight
+    cron_restart: '0 0 * * *' 
   }]
 };
 

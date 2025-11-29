@@ -11,7 +11,7 @@ router.get('/dashboard', async (req, res) => {
     let location;
     const clientIP = locationService.getClientIP(req);
 
-    // Check if coordinates are provided (from browser geolocation)
+    
     if (req.query.lat && req.query.lon) {
       const lat = parseFloat(req.query.lat);
       const lon = parseFloat(req.query.lon);
@@ -24,14 +24,14 @@ router.get('/dashboard', async (req, res) => {
         location = await locationService.getLocationFromIP(clientIP);
       }
     } else {
-      // Fallback to IP-based detection
+      
       console.log('📍 Using IP-based location detection');
       location = await locationService.getLocationFromIP(clientIP);
     }
     
     console.log(`🌍 User location: ${location.district}, ${location.state}`);
 
-    // Find nearest district in our database
+    
     let districtData = await DistrictData.findOne({
       $or: [
         { districtName: { $regex: new RegExp(location.district, 'i') } },
@@ -39,7 +39,7 @@ router.get('/dashboard', async (req, res) => {
       ]
     });
 
-    // If exact match not found, find nearest by coordinates
+   
     if (!districtData && location.latitude !== 0 && location.longitude !== 0) {
       districtData = await dataCollectorService.findNearestDistrict(
         location.latitude,
@@ -47,7 +47,7 @@ router.get('/dashboard', async (req, res) => {
       );
     }
 
-    // If still not found, use default (Delhi)
+    
     if (!districtData) {
       districtData = await DistrictData.findOne({ districtCode: 'IN-DL-ND' });
     }
@@ -58,13 +58,12 @@ router.get('/dashboard', async (req, res) => {
       });
     }
 
-    // ALWAYS detect languages based on detected location state (not database district state)
-    // This ensures correct language for user's actual location
+    
     console.log(`🔍 Detecting regional languages for detected location state: ${location.state}`);
     const detectedLanguages = translationService.detectRegionalLanguages(location.state);
     console.log(`✅ Detected languages:`, detectedLanguages);
     
-    // Update district data if needed (for caching)
+    
     if (!districtData.commonLanguages || districtData.commonLanguages.length === 0) {
       districtData.commonLanguages = detectedLanguages;
       districtData.regionalLanguages = detectedLanguages.map(lang => ({
@@ -74,10 +73,10 @@ router.get('/dashboard', async (req, res) => {
       await districtData.save();
     }
     
-    // Use detected languages from location, not from database (in case district is different)
+    
     districtData.commonLanguages = detectedLanguages;
 
-    // Log analytics
+    
     await Analytics.create({
       ipAddress: clientIP,
       location: {
@@ -92,12 +91,12 @@ router.get('/dashboard', async (req, res) => {
       userAgent: req.headers['user-agent']
     });
 
-    // Prepare recent data (last 12 months)
+    
     const recentData = districtData.dataPoints
       .slice(-12)
       .sort((a, b) => a.month.localeCompare(b.month));
 
-    // Calculate summary statistics
+   
     const latest = recentData[recentData.length - 1] || {};
     
     const summary = {
@@ -127,7 +126,7 @@ router.get('/dashboard', async (req, res) => {
       }
     };
 
-    // Generate simple explanations (template-based, no AI needed)
+    
     console.log('📝 Generating explanations...');
     const explanations = {
       employment: translationService.generateExplanation('employment', {
@@ -147,11 +146,10 @@ router.get('/dashboard', async (req, res) => {
       })
     };
 
-    // Don't pre-translate explanations - translate on-demand when user selects language
-    // Only send English explanations, frontend will translate when language is selected
+    
     const translatedExplanations = {};
 
-    // Prepare page content for translation
+   
     const pageContentEn = {
       title: 'MGNREGA Made Easy',
       tagline: 'Know Where Your Region Stands',
@@ -175,11 +173,10 @@ router.get('/dashboard', async (req, res) => {
       perDayLabel: 'Per Day'
     };
 
-    // Don't pre-translate page content - translate on-demand when user selects language
-    // Just send English version, frontend will translate when language is selected
+    
     const translatedPageContent = { English: pageContentEn };
 
-    // Use detected languages (always from location.state, not from database)
+    
     const finalDetectedLanguages = detectedLanguages;
     
     res.json({
@@ -224,9 +221,7 @@ router.get('/dashboard', async (req, res) => {
   }
 });
 
-/**
- * GET /api/districts - Get list of all districts
- */
+
 router.get('/districts', async (req, res) => {
   try {
     const districts = await DistrictData.find(
@@ -244,9 +239,7 @@ router.get('/districts', async (req, res) => {
   }
 });
 
-/**
- * POST /api/translate - Translate page content
- */
+
 router.post('/translate', async (req, res) => {
   try {
     const { text, targetLanguage } = req.body;
@@ -268,9 +261,7 @@ router.post('/translate', async (req, res) => {
   }
 });
 
-/**
- * POST /api/translate-batch - Translate multiple texts
- */
+
 router.post('/translate-batch', async (req, res) => {
   try {
     const { texts, targetLanguage } = req.body;
@@ -292,9 +283,7 @@ router.post('/translate-batch', async (req, res) => {
   }
 });
 
-/**
- * GET /api/stats - Platform statistics
- */
+
 router.get('/stats', async (req, res) => {
   try {
     const districtCount = await DistrictData.countDocuments();

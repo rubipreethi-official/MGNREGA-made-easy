@@ -19,7 +19,7 @@ const CacheSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Auto-delete expired cache entries (TTL index)
+
 CacheSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 module.exports = mongoose.model('Cache', CacheSchema);

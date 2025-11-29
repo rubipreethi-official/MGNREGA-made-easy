@@ -4,19 +4,18 @@ const Cache = require('../models/Cache');
 
 class DataCollectorService {
   constructor() {
-    // Government API endpoints for MGNREGA data
+    
     this.baseUrl = 'https://api.data.gov.in/resource/';
     this.apiKey = process.env.DATA_GOV_API_KEY || '579b464db66ec23bdd000001';
     
-    // Common MGNREGA resource IDs from data.gov.in
-    // These are example resource IDs - actual IDs may vary
+    
     this.resourceIds = {
       employment: 'mgnrega-employment-data',
       expenditure: 'mgnrega-expenditure-data',
       works: 'mgnrega-works-data'
     };
     
-    // Sample districts for demonstration (will be expanded with real data)
+    
     this.sampleDistricts = [
       {
         districtCode: 'IN-DL-ND',
@@ -61,10 +60,7 @@ class DataCollectorService {
     ];
   }
 
-  /**
-   * Fetch data from government API with fallback to sample data
-   * This method attempts to fetch real MGNREGA data from data.gov.in
-   */
+  
   async fetchGovernmentData(resourceId, districtCode) {
     try {
       const url = `${this.baseUrl}${resourceId}`;
@@ -98,36 +94,30 @@ class DataCollectorService {
     }
   }
 
-  /**
-   * Parse government API data into our data format
-   */
+  
   parseGovernmentData(apiData, districtCode) {
-    // This would parse the actual API response structure
-    // For now, returns null to use sample data
-    // Implementation depends on actual API response structure
+
     return null;
   }
 
-  /**
-   * Generate realistic sample data for demonstration
-   */
+ 
   generateSampleData(districtCode, districtName) {
     const dataPoints = [];
     const currentDate = new Date();
     
-    // Generate 12 months of data
+    
     for (let i = 11; i >= 0; i--) {
       const date = new Date(currentDate);
       date.setMonth(date.getMonth() - i);
-      const month = date.toISOString().slice(0, 7); // YYYY-MM
+      const month = date.toISOString().slice(0, 7); 
       const year = date.getFullYear();
 
-      // Generate realistic numbers with some variance
+      
       const baseDemand = 5000 + Math.floor(Math.random() * 10000);
       const demandVariation = 0.7 + Math.random() * 0.3;
       const personsDemanded = Math.floor(baseDemand * demandVariation);
       
-      const employmentRate = 0.75 + Math.random() * 0.2; // 75-95%
+      const employmentRate = 0.75 + Math.random() * 0.2; 
       const personsEmployed = Math.floor(personsDemanded * employmentRate);
       
       const avgWage = 200 + Math.floor(Math.random() * 50);
@@ -166,9 +156,7 @@ class DataCollectorService {
     return dataPoints;
   }
 
-  /**
-   * Collect and store data for all districts
-   */
+
   async collectAllData() {
     console.log('📊 Starting data collection...');
     
@@ -183,9 +171,7 @@ class DataCollectorService {
     console.log('✅ Data collection completed');
   }
 
-  /**
-   * Collect data for a specific district
-   */
+  
   async collectDistrictData(districtInfo) {
     try {
       console.log(`📥 Collecting data for ${districtInfo.districtName}...`);
@@ -200,7 +186,7 @@ class DataCollectorService {
       );
 
       if (existingDistrict) {
-        // Merge new data points with existing ones
+        
         const existingMonths = new Set(
           existingDistrict.dataPoints.map(dp => dp.month)
         );
@@ -218,7 +204,7 @@ class DataCollectorService {
         await existingDistrict.save();
         console.log(`✅ Updated ${districtInfo.districtName} with ${newDataPoints.length} new data points`);
       } else {
-        // Create new district entry
+        
         const newDistrict = new DistrictData({
           districtCode: districtInfo.districtCode,
           districtName: districtInfo.districtName,
@@ -239,9 +225,7 @@ class DataCollectorService {
     }
   }
 
-  /**
-   * Search for nearest district by coordinates
-   */
+ 
   async findNearestDistrict(lat, lon) {
     try {
       const districts = await DistrictData.find({
@@ -273,11 +257,9 @@ class DataCollectorService {
     }
   }
 
-  /**
-   * Calculate distance between two coordinates (Haversine formula)
-   */
+ 
   calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Earth's radius in km
+    const R = 6371; 
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     

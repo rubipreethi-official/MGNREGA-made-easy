@@ -10,6 +10,7 @@ const apiRoutes = require('./routes/api');
 const dataCollectorService = require('./services/dataCollectorService');
 
 const app = express();
+// Render provides PORT automatically, fallback to 3000 for local
 const PORT = process.env.PORT || 3000;
 
 // Connect to MongoDB

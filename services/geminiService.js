@@ -9,9 +9,7 @@ class GeminiService {
     this.model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
   }
 
-  /**
-   * Detect common languages spoken in a region based on location
-   */
+  
   async detectRegionalLanguages(lat, lon, stateName, districtName) {
     try {
       const prompt = `You are a linguistics expert for India. Based on the following location information:
@@ -30,21 +28,18 @@ class GeminiService {
       const response = await result.response;
       const text = response.text().trim();
 
-      // Parse the JSON array
+     
       const languages = JSON.parse(text.replace(/```json\n?/g, '').replace(/```/g, '').trim());
       
-      console.log(`🌍 Detected languages for ${districtName}:`, languages);
+      console.log(`Detected languages for ${districtName}:`, languages);
       return languages;
     } catch (error) {
-      console.error('❌ Error detecting languages:', error.message);
-      // Fallback to common Indian languages
+      console.error('Error detecting languages:', error.message);
+      
       return ['Hindi', 'English'];
     }
   }
 
-  /**
-   * Translate English text to regional language
-   */
   async translateToLanguage(text, targetLanguage) {
     try {
       const prompt = `Translate the following text to ${targetLanguage}. 
@@ -60,7 +55,7 @@ class GeminiService {
       const response = await result.response;
       const translatedText = response.text().trim();
 
-      // Clean up common issues
+      
       const cleaned = translatedText
         .replace(/Translation:/g, '')
         .replace(/Translated text:/g, '')

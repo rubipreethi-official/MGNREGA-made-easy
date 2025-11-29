@@ -1,21 +1,15 @@
 const axios = require('axios');
 
-/**
- * Translation service using MyMemory Translation API
- * Free, supports Tamil and all Indian languages well
- */
+
 class TranslationService {
   constructor() {
-    // MyMemory Translation API - free, no key needed for basic use
+
     this.baseUrl = 'https://api.mymemory.translated.net/get';
   }
 
-  /**
-   * Detect languages based on Indian state mapping
-   * No AI needed - direct state-to-language mapping
-   */
+
   detectRegionalLanguages(stateName) {
-    // Normalize state name (case-insensitive, handle variations)
+   
     const normalizedState = stateName ? stateName.trim() : '';
     
     const stateLanguageMap = {
@@ -42,9 +36,9 @@ class TranslationService {
       'Rajasthan': ['Hindi', 'English'],
       'Sikkim': ['Nepali', 'English'],
       'Tamil Nadu': ['Tamil', 'English'],
-      'Tamilnadu': ['Tamil', 'English'], // Handle without space
-      'Tamil nadu': ['Tamil', 'English'], // Handle lowercase
-      'TAMIL NADU': ['Tamil', 'English'], // Handle uppercase
+      'Tamilnadu': ['Tamil', 'English'], 
+      'Tamil nadu': ['Tamil', 'English'], 
+      'TAMIL NADU': ['Tamil', 'English'], 
       'Telangana': ['Telugu', 'English'],
       'Tripura': ['Bengali', 'English'],
       'Uttar Pradesh': ['Hindi', 'English'],
@@ -55,10 +49,10 @@ class TranslationService {
       'Ladakh': ['Ladakhi', 'English']
     };
 
-    // Try exact match first
+    
     let languages = stateLanguageMap[normalizedState];
     
-    // If not found, try case-insensitive match
+    
     if (!languages) {
       const stateKey = Object.keys(stateLanguageMap).find(
         key => key.toLowerCase() === normalizedState.toLowerCase()
@@ -68,7 +62,7 @@ class TranslationService {
       }
     }
     
-    // If still not found, try partial match (e.g., "Tamil" in "Tamil Nadu")
+    
     if (!languages && normalizedState.length > 0) {
       const stateKey = Object.keys(stateLanguageMap).find(
         key => key.toLowerCase().includes(normalizedState.toLowerCase()) || 
@@ -79,7 +73,7 @@ class TranslationService {
       }
     }
     
-    // Default fallback
+    
     if (!languages) {
       console.warn(`⚠️ State "${stateName}" not found in language map, defaulting to Hindi + English`);
       languages = ['Hindi', 'English'];
@@ -89,13 +83,10 @@ class TranslationService {
     return languages;
   }
 
-  /**
-   * Translate text using MyMemory Translation API
-   * Free API that supports Tamil and all Indian languages
-   */
+ 
   async translateToLanguage(text, targetLanguage) {
     try {
-      // Map language names to language codes
+      
       const languageCode = this.getLanguageCode(targetLanguage);
       
       if (!languageCode) {
@@ -103,12 +94,12 @@ class TranslationService {
         return text;
       }
 
-      // If target is English or text is empty, return as is
+      
       if (languageCode === 'en' || !text || text.trim().length === 0) {
         return text;
       }
 
-      // MyMemory API uses GET requests
+      
       const response = await axios.get(this.baseUrl, {
         params: {
           q: text,
@@ -119,7 +110,7 @@ class TranslationService {
 
       if (response.data && response.data.responseData && response.data.responseData.translatedText) {
         const translated = response.data.responseData.translatedText.trim();
-        // Clean up any HTML entities
+        
         const cleaned = translated
           .replace(/&quot;/g, '"')
           .replace(/&#39;/g, "'")
@@ -127,21 +118,17 @@ class TranslationService {
           .replace(/&lt;/g, '<')
           .replace(/&gt;/g, '>');
         
-        console.log(`✅ Translated to ${targetLanguage} (${languageCode}): "${text.substring(0, 30)}..." -> "${cleaned.substring(0, 30)}..."`);
+        console.log(` Translated to ${targetLanguage} (${languageCode}): "${text.substring(0, 30)}..." -> "${cleaned.substring(0, 30)}..."`);
         return cleaned;
       }
 
       return text;
     } catch (error) {
-      console.error(`❌ Error translating to ${targetLanguage}:`, error.message);
-      // Return original text if translation fails
+      console.error(` Error translating to ${targetLanguage}:`, error.message);
+      
       return text;
     }
   }
-
-  /**
-   * Translate multiple texts in parallel
-   */
   async translateMultiple(texts, targetLanguage) {
     try {
       const translations = await Promise.all(
@@ -149,15 +136,12 @@ class TranslationService {
       );
       return translations;
     } catch (error) {
-      console.error('❌ Error in batch translation:', error.message);
-      return texts; // Return original texts if translation fails
+      console.error(' Error in batch translation:', error.message);
+      return texts; 
     }
   }
 
-  /**
-   * Generate simple explanations without AI
-   * Simple, template-based explanations for low-literacy users
-   */
+
   generateExplanation(visualizationType, data) {
     if (visualizationType === 'employment') {
       const rate = data.employmentRate || 0;
@@ -191,9 +175,7 @@ class TranslationService {
     return 'This chart shows important information about MGNREGA programs in your district.';
   }
 
-  /**
-   * Get language code from language name
-   */
+  
   getLanguageCode(languageName) {
     const languageMap = {
       'Tamil': 'ta',

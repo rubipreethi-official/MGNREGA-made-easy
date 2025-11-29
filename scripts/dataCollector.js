@@ -1,7 +1,3 @@
-/**
- * Standalone data collection script
- * Can be run manually or via cron job
- */
 
 const mongoose = require('mongoose');
 require('dotenv').config();
@@ -14,11 +10,9 @@ async function main() {
     console.log(`📅 ${new Date().toISOString()}`);
     
     try {
-        // Connect to database
         await connectDB();
         console.log('✅ Connected to database');
 
-        // Collect data for all districts
         await dataCollectorService.collectAllData();
 
         console.log('✅ Data collection completed successfully');
@@ -29,7 +23,7 @@ async function main() {
     }
 }
 
-// Run if executed directly
+
 if (require.main === module) {
     main();
 }
