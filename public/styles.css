@@ -1,4 +1,3 @@
-
 * {
     margin: 0;
     padding: 0;
@@ -50,7 +49,7 @@ body {
     opacity: 0.9;
 }
 
-
+/* Loading Screen */
 .loading-screen {
     position: fixed;
     top: 0;
@@ -91,12 +90,12 @@ body {
     color: var(--text-light);
 }
 
-
+/* Main Container */
 .main-container {
     min-height: calc(100vh - 200px);
 }
 
-
+/* Hero Section */
 .hero {
     background: var(--white);
     padding: 40px 0;
@@ -115,7 +114,7 @@ body {
     color: var(--text-light);
 }
 
-
+/* Language Selector */
 .language-selector {
     background: var(--white);
     padding: 20px 0;
@@ -168,7 +167,7 @@ body {
     transform: none;
 }
 
-
+/* Chart Section */
 .chart-section {
     margin-bottom: 30px;
 }
@@ -193,15 +192,56 @@ body {
     text-align: center;
 }
 
-.chart-container {
+/* Python Chart Container - FIXED */
+.chart-container-python {
     position: relative;
-    height: 300px;
+    width: 100%;
+    min-height: 350px;
     margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--white);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+/* Python Chart Image - FIXED */
+.python-chart {
+    max-width: 100%;
+    max-height: 400px;
+    height: auto;
+    display: none;
+    border-radius: 8px;
+}
+
+/* Remove "Generating charts..." text - FIXED */
+.chart-container-python:not(:has(.python-chart[src])):before {
+    content: '🐍 Generating chart...';
+    position: absolute;
+    font-size: 1.2rem;
+    color: var(--text-light);
+}
+
+/* Hide loading text when chart is loaded - FIXED */
+.python-chart[src] {
+    display: block !important;
+}
+
+.chart-container-python:has(.python-chart[src]):before {
+    display: none !important;
+}
+
+/* Chart Explanation Container - FIXED */
+.chart-explanation-container {
+    position: relative;
+    margin-top: 20px;
 }
 
 .chart-explanation {
     background: linear-gradient(135deg, #e8f8f5, #d5f4e6);
     padding: 20px;
+    padding-right: 80px;
     border-radius: 8px;
     border-left: 4px solid var(--primary-color);
     font-size: 1.1rem;
@@ -209,7 +249,66 @@ body {
     color: var(--text-dark);
 }
 
+/* Listen Button - FIXED */
+.speak-btn {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 55px;
+    height: 55px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    transition: all 0.3s ease;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 8px;
+}
 
+.speak-btn:hover {
+    background: linear-gradient(135deg, #2980b9, #21618c);
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
+}
+
+.speak-btn:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.speak-icon {
+    font-size: 1.5rem;
+    margin-bottom: 2px;
+}
+
+.speak-text {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.speak-btn.speaking {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    animation: pulse-speak 1s ease-in-out infinite;
+}
+
+@keyframes pulse-speak {
+    0%, 100% {
+        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 20px rgba(231, 76, 60, 0.6);
+    }
+}
+
+/* Stats Section */
 .stats-section {
     background: var(--white);
     padding: 40px 0;
@@ -288,12 +387,29 @@ body {
         font-size: 1.2rem;
     }
 
-    .chart-container {
-        height: 250px;
+    .chart-container-python {
+        min-height: 300px;
+        padding: 15px;
     }
 
     .chart-explanation {
+        padding: 15px;
+        padding-right: 70px;
         font-size: 1rem;
+    }
+
+    .speak-btn {
+        width: 50px;
+        height: 50px;
+        right: 10px;
+    }
+
+    .speak-icon {
+        font-size: 1.3rem;
+    }
+
+    .speak-text {
+        font-size: 0.6rem;
     }
 
     .stats-grid {
@@ -323,132 +439,11 @@ body {
         font-size: 0.9rem;
     }
 
-    .chart-container {
-        height: 200px;
-    }
-}
-
-
-:focus {
-    outline: 3px solid var(--primary-color);
-    outline-offset: 2px;
-}
-
-
-@media print {
-    .header, .footer, .language-selector {
-        display: none;
-    }
-    
-    .chart-card {
-        page-break-inside: avoid;
-    }
-}
-
-/* ==================== TEXT-TO-SPEECH STYLES ==================== */
-
-/* Explanation container with button */
-.chart-explanation-container {
-    position: relative;
-}
-
-.chart-explanation {
-    background: linear-gradient(135deg, #e8f8f5, #d5f4e6);
-    padding: 20px;
-    padding-right: 80px; /* Make room for button */
-    border-radius: 8px;
-    border-left: 4px solid var(--primary-color);
-    font-size: 1.1rem;
-    line-height: 1.8;
-    color: var(--text-dark);
-    margin-bottom: 0;
-}
-
-/* Speak button */
-.speak-btn {
-    position: absolute;
-    top: 50%;
-    right: 15px;
-    transform: translateY(-50%);
-    background: linear-gradient(135deg, #3498db, #2980b9);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 55px;
-    height: 55px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
-    transition: all 0.3s ease;
-    font-size: 0.7rem;
-    font-weight: 600;
-    padding: 8px;
-}
-
-.speak-btn:hover {
-    background: linear-gradient(135deg, #2980b9, #21618c);
-    transform: translateY(-50%) scale(1.1);
-    box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
-}
-
-.speak-btn:active {
-    transform: translateY(-50%) scale(0.95);
-}
-
-.speak-icon {
-    font-size: 1.5rem;
-    margin-bottom: 2px;
-}
-
-.speak-text {
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-
-.speak-btn.speaking {
-    background: linear-gradient(135deg, #e74c3c, #c0392b);
-    animation: pulse-speak 1s ease-in-out infinite;
-}
-
-
-@keyframes pulse-speak {
-    0%, 100% {
-        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
-    }
-    50% {
-        box-shadow: 0 4px 20px rgba(231, 76, 60, 0.6);
-    }
-}
-
-
-@media (max-width: 768px) {
-    .chart-explanation {
-        padding: 15px;
-        padding-right: 70px;
-        font-size: 1rem;
+    .chart-container-python {
+        min-height: 250px;
+        padding: 10px;
     }
 
-    .speak-btn {
-        width: 50px;
-        height: 50px;
-        right: 10px;
-    }
-
-    .speak-icon {
-        font-size: 1.3rem;
-    }
-
-    .speak-text {
-        font-size: 0.6rem;
-    }
-}
-
-@media (max-width: 480px) {
     .chart-explanation {
         padding: 12px;
         padding-right: 65px;
@@ -470,12 +465,19 @@ body {
     }
 }
 
-
-.speak-btn.loading {
-    pointer-events: none;
-    opacity: 0.7;
+/* Focus states for accessibility */
+:focus {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 2px;
 }
 
-.speak-btn.loading .speak-icon {
-    animation: spin 1s linear infinite;
+/* Print styles */
+@media print {
+    .header, .footer, .language-selector {
+        display: none;
+    }
+    
+    .chart-card {
+        page-break-inside: avoid;
+    }
 }

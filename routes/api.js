@@ -5,13 +5,14 @@ const Analytics = require('../models/Analytics');
 const locationService = require('../services/locationService');
 const translationService = require('../services/translationService');
 const dataCollectorService = require('../services/dataCollectorService');
+const chartService = require('../services/chartService'); // NEW: Python chart service
 
 router.get('/dashboard', async (req, res) => {
   try {
     let location;
     const clientIP = locationService.getClientIP(req);
 
-    
+    // Get location from browser geolocation or IP
     if (req.query.lat && req.query.lon) {
       const lat = parseFloat(req.query.lat);
       const lon = parseFloat(req.query.lon);
@@ -24,14 +25,13 @@ router.get('/dashboard', async (req, res) => {
         location = await locationService.getLocationFromIP(clientIP);
       }
     } else {
-      
       console.log('📍 Using IP-based location detection');
       location = await locationService.getLocationFromIP(clientIP);
     }
     
     console.log(`🌍 User location: ${location.district}, ${location.state}`);
 
-    
+    // Find district data
     let districtData = await DistrictData.findOne({
       $or: [
         { districtName: { $regex: new RegExp(location.district, 'i') } },
@@ -39,7 +39,6 @@ router.get('/dashboard', async (req, res) => {
       ]
     });
 
-   
     if (!districtData && location.latitude !== 0 && location.longitude !== 0) {
       districtData = await dataCollectorService.findNearestDistrict(
         location.latitude,
@@ -47,7 +46,6 @@ router.get('/dashboard', async (req, res) => {
       );
     }
 
-    
     if (!districtData) {
       districtData = await DistrictData.findOne({ districtCode: 'IN-DL-ND' });
     }
@@ -58,11 +56,10 @@ router.get('/dashboard', async (req, res) => {
       });
     }
 
-    
+    // Detect languages
     console.log(`🔍 Detecting regional languages for detected location state: ${location.state}`);
     const detectedLanguages = translationService.detectRegionalLanguages(location.state);
     console.log(`✅ Detected languages:`, detectedLanguages);
-    
     
     if (!districtData.commonLanguages || districtData.commonLanguages.length === 0) {
       districtData.commonLanguages = detectedLanguages;
@@ -73,10 +70,9 @@ router.get('/dashboard', async (req, res) => {
       await districtData.save();
     }
     
-    
     districtData.commonLanguages = detectedLanguages;
 
-    
+    // Track analytics
     await Analytics.create({
       ipAddress: clientIP,
       location: {
@@ -91,12 +87,10 @@ router.get('/dashboard', async (req, res) => {
       userAgent: req.headers['user-agent']
     });
 
-    
     const recentData = districtData.dataPoints
       .slice(-12)
       .sort((a, b) => a.month.localeCompare(b.month));
 
-   
     const latest = recentData[recentData.length - 1] || {};
     
     const summary = {
@@ -126,7 +120,15 @@ router.get('/dashboard', async (req, res) => {
       }
     };
 
-    
+    // 🐍 NEW: Generate charts using Python
+    let charts = null;
+    try {
+      charts = await chartService.generateAllCharts(summary);
+      console.log('✅ Python charts generated successfully');
+    } catch (error) {
+      console.error('⚠️ Failed to generate Python charts, continuing without charts:', error.message);
+    }
+
     console.log('📝 Generating explanations...');
     const explanations = {
       employment: translationService.generateExplanation('employment', {
@@ -146,10 +148,8 @@ router.get('/dashboard', async (req, res) => {
       })
     };
 
-    
     const translatedExplanations = {};
-
-   
+    
     const pageContentEn = {
       title: 'MGNREGA Made Easy',
       tagline: 'Know Where Your Region Stands',
@@ -173,10 +173,7 @@ router.get('/dashboard', async (req, res) => {
       perDayLabel: 'Per Day'
     };
 
-    
     const translatedPageContent = { English: pageContentEn };
-
-    
     const finalDetectedLanguages = detectedLanguages;
     
     res.json({
@@ -185,14 +182,15 @@ router.get('/dashboard', async (req, res) => {
       data: {
         summary: {
           ...summary,
-          detectedLanguages: finalDetectedLanguages // Use languages from detected location
+          detectedLanguages: finalDetectedLanguages
         },
-        detectedLanguages: finalDetectedLanguages, // Use languages from detected location
+        detectedLanguages: finalDetectedLanguages,
+        charts: charts, // 🐍 NEW: Include Python-generated charts
         explanations: {
           English: explanations,
           ...translatedExplanations
         },
-        pageContent: translatedPageContent, // Pre-translated content for all languages
+        pageContent: translatedPageContent,
         historical: recentData.map(dp => ({
           month: dp.month,
           year: dp.year,
@@ -221,7 +219,7 @@ router.get('/dashboard', async (req, res) => {
   }
 });
 
-
+// Keep all other routes the same...
 router.get('/districts', async (req, res) => {
   try {
     const districts = await DistrictData.find(
@@ -238,7 +236,6 @@ router.get('/districts', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
 
 router.post('/translate', async (req, res) => {
   try {
@@ -261,7 +258,6 @@ router.post('/translate', async (req, res) => {
   }
 });
 
-
 router.post('/translate-batch', async (req, res) => {
   try {
     const { texts, targetLanguage } = req.body;
@@ -282,7 +278,6 @@ router.post('/translate-batch', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
 
 router.get('/stats', async (req, res) => {
   try {
@@ -307,4 +302,3 @@ router.get('/stats', async (req, res) => {
 });
 
 module.exports = router;
-

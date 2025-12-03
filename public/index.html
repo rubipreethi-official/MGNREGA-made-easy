@@ -6,35 +6,28 @@
     <meta name="description" content="MGNREGA Made Easy - Know where your region stands with simple visualizations">
     <title>MGNREGA Made Easy | Know Where Your Region Stands</title>
     
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-   
     <header class="header">
         <div class="container">
             <div class="logo">
                 <h1>🎯 MGNREGA Made Easy</h1>
-                
                 <p class="tagline">Know Where Your Region Stands</p>
             </div>
         </div>
     </header>
 
-    
     <div id="loadingScreen" class="loading-screen">
         <div class="loading-content">
             <div class="spinner"></div>
             <h2>Loading Your District Data...</h2>
             <p>📍 Detecting your location and preparing insights</p>
+            <p style="font-size: 0.9em; margin-top: 10px; opacity: 0.8;"></p>
         </div>
     </div>
 
-   
     <main class="main-container" id="mainContent" style="display: none;">
-       
         <section class="hero">
             <div class="container">
                 <div class="location-info">
@@ -44,7 +37,6 @@
             </div>
         </section>
 
-        
         <section class="language-selector" id="languageSelector">
             <div class="container">
                 <label for="langSelect">🌐 Choose Language:</label>
@@ -58,15 +50,15 @@
             </div>
         </section>
 
-       
+        <!-- Employment Chart -->
         <section class="chart-section">
             <div class="container">
                 <div class="chart-card">
                     <h3>👥 Employment Status</h3>
-                    <div class="chart-container">
-                        <canvas id="employmentChart"></canvas>
+                    <div class="chart-container-python">
+                        <img id="employmentChart" alt="Employment Chart" class="python-chart">
                     </div>
-                   <div class="chart-explanation-container">
+                    <div class="chart-explanation-container">
                         <div class="chart-explanation" id="employmentExplanation"></div>
                         <button class="speak-btn" onclick="speakExplanation('employment')" title="Listen to explanation">
                             <span class="speak-icon">🔊</span>
@@ -77,13 +69,13 @@
             </div>
         </section>
 
-        
+        <!-- Expenditure Chart -->
         <section class="chart-section">
             <div class="container">
                 <div class="chart-card">
                     <h3>💰 Money Spent Analysis</h3>
-                    <div class="chart-container">
-                        <canvas id="expenditureChart"></canvas>
+                    <div class="chart-container-python">
+                        <img id="expenditureChart" alt="Expenditure Chart" class="python-chart">
                     </div>
                     <div class="chart-explanation-container">
                         <div class="chart-explanation" id="expenditureExplanation"></div>
@@ -96,15 +88,15 @@
             </div>
         </section>
 
-       
+        <!-- Works Chart -->
         <section class="chart-section">
             <div class="container">
                 <div class="chart-card">
                     <h3>🏗️ Works Progress</h3>
-                    <div class="chart-container">
-                        <canvas id="worksChart"></canvas>
+                    <div class="chart-container-python">
+                        <img id="worksChart" alt="Works Chart" class="python-chart">
                     </div>
-                   <div class="chart-explanation-container">
+                    <div class="chart-explanation-container">
                         <div class="chart-explanation" id="worksExplanation"></div>
                         <button class="speak-btn" onclick="speakExplanation('works')" title="Listen to explanation">
                             <span class="speak-icon">🔊</span>
@@ -115,38 +107,25 @@
             </div>
         </section>
 
-       
-        <section class="chart-section">
-            <div class="container">
-                <div class="chart-card">
-                    <h3>📈 Employment Trends (Last 12 Months)</h3>
-                    <div class="chart-container">
-                        <canvas id="trendChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-       
+        <!-- Stats Section -->
         <section class="stats-section">
             <div class="container">
                 <h2>📊 Key Statistics</h2>
                 <div class="stats-grid" id="statsGrid">
-                    
+                    <!-- Stats will be populated by JavaScript -->
                 </div>
             </div>
         </section>
     </main>
 
-   
     <footer class="footer">
         <div class="container">
             <p>&copy; 2024 MGNREGA Made Easy | Empowering Rural India</p>
             <p class="disclaimer">Data sourced from Government of India Open Data Portal</p>
+            <p style="font-size: 0.8em; margin-top: 10px;"></p>
         </div>
     </footer>
 
-    <script src="app.js"></script>
+    <script src="app_python.js"></script>
 </body>
 </html>
-
