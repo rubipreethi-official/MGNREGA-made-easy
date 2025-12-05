@@ -3,6 +3,12 @@ const cors = require('cors');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
+const fs = require('fs');
+
+// Load .env.local first (local dev), then .env (shared)
+if (fs.existsSync('.env.local')) {
+  require('dotenv').config({ path: '.env.local' });
+}
 require('dotenv').config();
 
 const connectDB = require('./config/database');

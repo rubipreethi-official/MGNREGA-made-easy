@@ -8,7 +8,7 @@
     "dev": "nodemon server.js",
     "collect-data": "node scripts/dataCollector.js",
     "seed-data": "node scripts/seedData.js",
-    "postinstall": "npm run collect-data || true"
+     "postinstall": "pip install -r requirements.txt"
   },
   "keywords": [
     "mgnrega",

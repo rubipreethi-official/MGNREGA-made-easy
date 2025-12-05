@@ -3,6 +3,7 @@ const path = require('path');
 
 class ChartService {
   constructor() {
+    // Use python command - works everywhere when requirements.txt is installed
     this.pythonPath = process.env.PYTHON_PATH || 'python';
     this.scriptPath = path.join(__dirname, '..', 'scripts', 'chart_generator.py');
   }
